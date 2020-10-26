@@ -354,6 +354,14 @@ int main(int argc, char* argv[])
             double firstCoreTemperature = getTemperatureKeyTemplate(coreList[0], templateKey);
 
             if (firstCoreTemperature == 0) {
+                // https://logi.wiki/index.php/SMC_Sensor_Codes
+                // try again with macbookpro first core temperature = TC1C code(key)
+                for (int i = 0; i < coreCount; ++i)
+                    coreList[i] = i+1;
+                firstCoreTemperature = getTemperatureKeyTemplate(coreList[0], templateKey);
+            }
+
+            if (firstCoreTemperature == 0) {
                 // The first core does not exist
                 printf("The specified core (%lu) does not exist.\n", coreList[0]);
                 exit(1);
@@ -376,8 +384,15 @@ int main(int argc, char* argv[])
             }
             break;
         }
-        case package:
-            printTemperature(convertToCorrectScale(scale, SMCGetTemperature(SMC_CPU_DIE_TEMP)), rounding);
+        case package: {
+                // https://logi.wiki/index.php/SMC_Sensor_Codes
+                // try again with macbookpro cpu proximity temperature = TC0P code(key)
+                double cpuTemperature = SMCGetTemperature(SMC_CPU_DIE_TEMP);
+                if (cpuTemperature == 0) {
+                    cpuTemperature = SMCGetTemperature(SMC_CPU_PPROXIMITY_TEMP);
+                }
+                printTemperature(convertToCorrectScale(scale, cpuTemperature), rounding);
+            }
             break;
     }
 
