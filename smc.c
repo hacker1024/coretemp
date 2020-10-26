@@ -389,7 +389,7 @@ int main(int argc, char* argv[])
                 // try again with macbookpro cpu proximity temperature = TC0P code(key)
                 double cpuTemperature = SMCGetTemperature(SMC_CPU_DIE_TEMP);
                 if (cpuTemperature == 0) {
-                    cpuTemperature = SMCGetTemperature(SMC_CPU_PPROXIMITY_TEMP);
+                    cpuTemperature = SMCGetTemperature(SMC_CPU_PROXIMITY_TEMP);
                 }
                 printTemperature(convertToCorrectScale(scale, cpuTemperature), rounding);
             }
