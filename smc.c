@@ -346,20 +346,18 @@ int main(int argc, char* argv[])
             if (!specifiedCores) {
                 coreCount = getPhysicalCoreCount();
                 coreList = realloc(coreList, coreCount * sizeof(unsigned long));
+                int coreOffset = 0;
+                if (SMCGetTemperature("TC0C") == 0 && SMCGetTemperature("TC0c") == 0) {
+                    // https://logi.wiki/index.php/SMC_Sensor_Codes
+                    // macbookpro first core temperature = TC1C code(key)
+                    coreOffset = 1;
+                }
                 for (int i = 0; i < coreCount; ++i)
-                    coreList[i] = i;
+                    coreList[i] = i + coreOffset;
             }
 
             char templateKey[7];
             double firstCoreTemperature = getTemperatureKeyTemplate(coreList[0], templateKey);
-
-            if (firstCoreTemperature == 0) {
-                // https://logi.wiki/index.php/SMC_Sensor_Codes
-                // try again with macbookpro first core temperature = TC1C code(key)
-                for (int i = 0; i < coreCount; ++i)
-                    coreList[i] = i+1;
-                firstCoreTemperature = getTemperatureKeyTemplate(coreList[0], templateKey);
-            }
 
             if (firstCoreTemperature == 0) {
                 // The first core does not exist
